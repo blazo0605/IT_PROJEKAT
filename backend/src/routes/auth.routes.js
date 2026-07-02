@@ -5,14 +5,14 @@ import { pool } from "../db.js";
 
 const router = express.Router();
 
-// REGISTRACIJA
+
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
     return res.status(400).json({ error: "Sva polja su obavezna" });
   }
   try {
-    // hash: nikad ne čuvaj plain lozinku. 10 = "cost factor"
+
     const password_hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
       `INSERT INTO users (username, email, password_hash)
@@ -22,7 +22,7 @@ router.post("/register", async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    // 23505 = unique violation (email ili username već postoji)
+
     if (err.code === "23505") {
       return res.status(409).json({ error: "Email ili username već zauzet" });
     }
@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// LOGIN
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -42,12 +42,12 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Pogrešan email ili lozinka" });
     }
-    // bcrypt.compare hashuje uneseni password i poredi sa sačuvanim
+
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
       return res.status(401).json({ error: "Pogrešan email ili lozinka" });
     }
-    // potpiši token sa id + role, traje 7 dana
+
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,

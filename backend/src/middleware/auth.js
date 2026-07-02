@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Čita "Authorization: Bearer <token>", provjeri ga, zakači req.user
+
 export function authenticate(req, res, next) {
   const header = req.headers.authorization;
   if (!header || !header.startsWith("Bearer ")) {
@@ -18,7 +18,6 @@ export function authenticate(req, res, next) {
   }
 }
 
-// Koristi se POSLIJE authenticate na admin rutama
 export function requireAdmin(req, res, next) {
   if (req.user.role !== "admin") {
     return res.status(403).json({ error: "Samo za admina" });
